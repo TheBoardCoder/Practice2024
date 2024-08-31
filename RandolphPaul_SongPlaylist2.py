@@ -1,4 +1,4 @@
-# Randolph Paul 5/5/2024 randolphPaul_finalExam
+# Randolph Paul 5/5/2024
 """The purpose of this program is to give users the ability
 to pick a platform and the number of songs in a playlist."""
 
