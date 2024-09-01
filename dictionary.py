@@ -3,7 +3,7 @@
 '''
 program illustrates the use of a dictionary in counting the occurances of
 the letter in a phrase
-
+testing github
 '''
 def main2():
   print('hello world')
