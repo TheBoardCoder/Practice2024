@@ -1,0 +1,204 @@
+//Name: Randolph Paul
+//This program gets information from the user in order to determine the recommended quality and calculate the performance score.
+
+//import scanner
+import java.util.Scanner;
+
+//declare file/class name
+public class Project5_Paul {
+   
+    //declare variables/constants
+    static final double CLOCK_SPEED_GPU_LOW_THRESHOLD = 800;
+    static final double CLOCK_SPEED_GPU_HI_THRESHOLD = 2000;
+    static final double CLOCK_SPEED_CPU_LOW_THRESHOLD = 1000;
+    static final double CLOCK_SPEED_CPU_HI_THRESHOLD = 5500;
+
+    static final int CORES_LOW_THRESHOLD = 1;
+    static final int CORES_HI_THRESHOLD = 20;
+
+    static int computerNum = 0;
+    static double totalPerformanceScore = 0.0;
+    
+    //run the main program
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        double averagePerformanceScore = 0.0;
+        char repeat;
+
+        do {
+            displayTitle();
+
+            System.out.print("Please enter the type of processor: ");
+            String processor = scanner.nextLine();
+
+            double gpuClockSpeed;
+            do {
+                System.out.print("Please enter the clock speed (in Megahertz) of your graphics card: ");
+                gpuClockSpeed = scanner.nextDouble();
+                if (gpuClockSpeed < CLOCK_SPEED_GPU_LOW_THRESHOLD || gpuClockSpeed > CLOCK_SPEED_GPU_HI_THRESHOLD) {
+                    System.out.println("The clock speed should be between " + CLOCK_SPEED_GPU_LOW_THRESHOLD + " and " + CLOCK_SPEED_GPU_HI_THRESHOLD + " Megahertz");
+                }
+            } while (gpuClockSpeed < CLOCK_SPEED_GPU_LOW_THRESHOLD || gpuClockSpeed > CLOCK_SPEED_GPU_HI_THRESHOLD);
+
+            double cpuClockSpeed;
+            do {
+                System.out.print("Please enter the clock speed (in Megahertz) of your processor: ");
+                cpuClockSpeed = scanner.nextDouble();
+                if (cpuClockSpeed < CLOCK_SPEED_CPU_LOW_THRESHOLD || cpuClockSpeed > CLOCK_SPEED_CPU_HI_THRESHOLD) {
+                    System.out.println("The clock speed should be between " + CLOCK_SPEED_CPU_LOW_THRESHOLD + " and " + CLOCK_SPEED_CPU_HI_THRESHOLD + " Megahertz");
+                }
+            } while (cpuClockSpeed < CLOCK_SPEED_CPU_LOW_THRESHOLD || cpuClockSpeed > CLOCK_SPEED_CPU_HI_THRESHOLD);
+
+            int cpuCoreNumber;
+            do {
+                System.out.print("Please enter the number of cores of your processor: ");
+                cpuCoreNumber = scanner.nextInt();
+                if (cpuCoreNumber < CORES_LOW_THRESHOLD || cpuCoreNumber > CORES_HI_THRESHOLD) {
+                    System.out.println("The number of cores should be between " + CORES_LOW_THRESHOLD + " and " + CORES_HI_THRESHOLD);
+                }
+            } while (cpuCoreNumber < CORES_LOW_THRESHOLD || cpuCoreNumber > CORES_HI_THRESHOLD);
+
+            scanner.nextLine(); // consume the newline
+
+            char overclock;
+            do {
+                System.out.print("Is the hardware overclock-friendly? (Enter y for yes or n for no): ");
+                overclock = scanner.nextLine().toLowerCase().charAt(0);
+                if (overclock != 'y' && overclock != 'n') {
+                    System.out.println("Error: the response should be y for yes or n for no");
+                }
+            } while (overclock != 'y' && overclock != 'n');
+
+            int monitorResolution = getMenuChoice(scanner);
+            double multiplier = getMultiplierValue(monitorResolution);
+            String monitorResolutionAsString = getResolutionString(monitorResolution);
+            double performanceScore = calculatePerformanceScore(gpuClockSpeed, cpuClockSpeed, cpuCoreNumber, multiplier);
+            String recommendedQuality = getRecommendedQuality(performanceScore);
+
+            displayInformation(gpuClockSpeed, cpuClockSpeed, cpuCoreNumber, monitorResolutionAsString, performanceScore, recommendedQuality, overclock);
+
+            System.out.print("Would you like to check another recommendation? Enter y for yes or n for no: ");
+            String repeatInput = scanner.nextLine();
+            repeat = scanner.nextLine().toLowerCase().charAt(0);
+
+            computerNum++;
+            totalPerformanceScore += performanceScore;
+
+        } while (repeat == 'y');
+
+        if (computerNum > 0) {
+            averagePerformanceScore = totalPerformanceScore / computerNum;
+        }
+        System.out.println("Average performance score: " + averagePerformanceScore);
+        scanner.close();
+    }
+   
+    //display program title
+    private static void displayTitle() {
+        System.out.println("Graphics Quality Recommendation Tool");
+    }
+    
+    //user chooses monitor display size
+    private static int getMenuChoice(Scanner scanner) {
+        int monitorResolution;
+        System.out.print("What is the resolution of your monitor?\n"
+        + "Display  1. 1280 x 720\n"
+        + "Display: 2. 1920 x 1080\n"
+        + "Display: 3. 2560 x 1440\n"
+        + "Display: 4. 3840 x 2160\n"
+        + "Please select from the options above (1, 2, 3 or 4): ");
+        monitorResolution = scanner.nextInt();
+
+        while (monitorResolution < 1 || monitorResolution > 4){
+            System.out.print("Invalid menu selection. Please select from the options above: ");
+        monitorResolution = scanner.nextInt();
+        }
+        return monitorResolution;
+    }
+    
+    //get the multiplier value
+    private static double getMultiplierValue(int monitorResolution) {
+        int RESOLUTION_1280_1024 = 1;
+        int RESOLUTION_1366_768 = 2;
+        int RESOLUTION_1600_900 = 3;
+        int RESOLUTION_1920_1080 = 4;
+        
+        double MULTIPLIER_1280_1024 = 1.0;
+        double MULTIPLIER_1366_768 = .75;
+        double MULTIPLIER_1600_900 = .55;
+        double MULTIPLIER_1920_1080 = .35;
+        double multiplier;
+        
+        if (monitorResolution == RESOLUTION_1280_1024) {
+            multiplier = RESOLUTION_1280_1024;
+        } else if (monitorResolution == RESOLUTION_1366_768) {
+            multiplier = RESOLUTION_1366_768;
+        } else if (monitorResolution == RESOLUTION_1600_900) {
+            multiplier = RESOLUTION_1600_900;
+        } else {
+            multiplier = RESOLUTION_1920_1080;
+        }
+        return multiplier;
+    }
+    
+    //user chooses monitor resolution
+    private static String getResolutionString(int monitorResolution) {
+        int RESOLUTION_1280_1024 = 1;
+        int RESOLUTION_1366_768 = 2;
+        int RESOLUTION_1600_900 = 3;
+        int RESOLUTION_1920_1080 = 4;
+        
+        String monitorResolutionAsString;
+        
+        if (monitorResolution == RESOLUTION_1280_1024) {
+            monitorResolutionAsString = "1280_1024";
+        } else if (monitorResolution == RESOLUTION_1366_768) {
+            monitorResolutionAsString = "1366_768";
+        } else if (monitorResolution == RESOLUTION_1600_900) {
+            monitorResolutionAsString = "1600_900";
+        } else {
+            monitorResolutionAsString = "1920_1080";
+        }
+        return monitorResolutionAsString;
+    }
+    
+    //calculate performance score
+    private static double calculatePerformanceScore(double gpuClockSpeed, double cpuClockSpeed, int cpuCoreNumber, double multiplier) {
+        int ATTRIBUTE = 6;
+        return ATTRIBUTE * gpuClockSpeed + (cpuCoreNumber * cpuClockSpeed) * multiplier;
+    }
+
+    //get recommended perfomance quality
+    private static String getRecommendedQuality(double performanceScore) {
+        double PERFORMANCE_THRESHOLD_HD_PLUS = 17000;
+        double PERFORMANCE_THRESHOLD_HD = 15000;
+        double PERFORMANCE_THRESHOLD_FHD = 13000;
+        double PERFORMANCE_THRESHOLD_WUXGA = 11000;
+        String recommendedQuality;
+        
+        if (performanceScore > PERFORMANCE_THRESHOLD_HD_PLUS) {
+            recommendedQuality = "Ultra Extended";
+        } else if (performanceScore > PERFORMANCE_THRESHOLD_HD) {
+            recommendedQuality = "Ultra";
+        } else if (performanceScore > PERFORMANCE_THRESHOLD_FHD) {
+            recommendedQuality = "Medium";
+        } else if (performanceScore > PERFORMANCE_THRESHOLD_WUXGA) {
+            recommendedQuality = "Low";
+        } else {
+            recommendedQuality = "Unable to Play";
+        }
+        return recommendedQuality;
+    }
+   
+    //display program's results
+    private static void displayInformation(double gpuClockSpeed, double cpuClockSpeed, int cpuCoreNumber, String monitorResolutionAsString, double performanceScore, String recommendedQuality, char overclock) {
+        System.out.println("Monitor Resolution: " + monitorResolutionAsString);
+        System.out.println("GPU Clock Speed: " + gpuClockSpeed + " MHz");
+        System.out.println("CPU Clock Speed: " + cpuClockSpeed + " MHz");
+        System.out.println("CPU Core Number: " + cpuCoreNumber);
+        System.out.println("Performance Score: " + performanceScore);
+        System.out.println("Recommended Quality: " + recommendedQuality);
+        System.out.println("Overclock-friendly: " + (overclock == 'y' ? "Yes" : "No"));
+    }
+}
+ 
